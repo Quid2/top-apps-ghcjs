@@ -51,3 +51,8 @@ You can now open the apps in your browser:
 * `chat` at `www/chat/index.html`
 * `ui`at `www/ui/index.html` 
 
+### Development
+To automatically recompile your code:
+```
+stack build --file-watch
+```
