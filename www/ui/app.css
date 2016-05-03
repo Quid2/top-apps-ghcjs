@@ -1,0 +1,25 @@
+html, body, #wrapper
+{margin:10px
+}
+
+table {
+    //width:80%
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid black;
+}
+
+th {
+    text-align: left;
+}
+
+th#chans-head-type {width:10%}
+th#chans-head-definition {width:50%}
+th#chans-head-clients {width:20%}
+th#chans-head-messages {width:20%}
+
+td {
+    vertical-align:top
+}
