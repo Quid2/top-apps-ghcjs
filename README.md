@@ -3,7 +3,7 @@ Example WWW applications for [quid2-net](https://github.com/tittoassini/quid2-ne
 Applications:
 * [chat](app/Chat/chat.hs) ([live version](http://quid2.org/app/chat))
   * Simple chat application, developed using [ghcjs-dom](https://hackage.haskell.org/package/ghcjs-dom)
-* [ui](app/UI) ([live version](http://quid2.org/app/ui))
+* [ui](app/UI) ([live version](http://quid2.org/app/ui)).
   * Generic UI for quid2-net, show existing channels and types, developed using [react-flux](https://hackage.haskell.org/package/react-flux).
 
 ### Installation 
