@@ -3,8 +3,8 @@ Example WWW applications for [quid2-net](https://github.com/tittoassini/quid2-ne
 Applications:
 * [chat](app/Chat/chat.hs) ([live version](http://quid2.org/app/chat))
   * Simple chat application, developed using [ghcjs-dom](https://hackage.haskell.org/package/ghcjs-dom)
-* [ui](app/UI) ([live version](http://quid2.org/app/ui))
-  * Generic UI for quid2-net, show existing channels and types, developed using [react-flux](https://hackage.haskell.org/package/react-flux).
+* [ui](app/UI) ([live version](http://quid2.org/app/ui)).
+  * Generic UI for quid2-net, shows existing channels and types, developed using [react-flux](https://hackage.haskell.org/package/react-flux).
 
 ### Installation 
 
@@ -41,7 +41,7 @@ Once the setup has completed successfully, you can compile the project itself:
 stack build
 ```
 
-Finally, to link the compiler output into the `www` subdirectories:
+Finally, to link the compiler output into the `www` subdirectories (this has to be done everytime you change the stack resolver or the ghcjs compiler version or update from github):
 
 ```
 make
@@ -51,3 +51,8 @@ You can now open the apps in your browser:
 * `chat` at `www/chat/index.html`
 * `ui`at `www/ui/index.html` 
 
+### Development
+To automatically recompile your code:
+```
+stack build --file-watch
+```
