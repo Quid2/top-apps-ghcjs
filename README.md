@@ -41,7 +41,7 @@ Once the setup has completed successfully, you can compile the project itself:
 stack build
 ```
 
-Finally, to link the compiler output into the `www` subdirectories:
+Finally, to link the compiler output into the `www` subdirectories (this has to be done everytime you change the stack resolver or the ghcjs compiler version or update from github):
 
 ```
 make
