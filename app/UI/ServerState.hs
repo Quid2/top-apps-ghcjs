@@ -5,7 +5,7 @@ import JavaScript.Web.XMLHttpRequest
 import qualified Data.JSString as J
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as L
-import Report
+import Model.Report
 import Control.Monad
 import Data.Maybe
 import Network.Quid2.Types(Config(..),def)

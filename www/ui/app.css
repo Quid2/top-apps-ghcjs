@@ -15,8 +15,7 @@ th {
     text-align: left;
 }
 
-th#chans-head-type {width:10%}
-th#chans-head-definition {width:50%}
+th#chans-head-type {width:60%}
 th#chans-head-clients {width:20%}
 th#chans-head-messages {width:20%}
 

@@ -8,15 +8,17 @@ module UI.Views where
 import           Control.Monad               (when)
 import           Data.List
 import qualified Data.Map                    as M
+import           Data.Maybe
 import           Data.Ord
 import qualified Data.Text                   as T
 import           Data.Typed
+import           Model.Report
 import           React.Flux
 import           React.Flux.Addons.Bootstrap
-import           Report
 import           UI.Dispatcher
 import           UI.Store
 
+updateDelay :: Int
 updateDelay = 15
 
 -- | The controller view and also the top level of the UI app.  This controller view registers
@@ -69,7 +71,6 @@ uiChannels_ st = section_ (id_ "main") $
       thead_ (id_ "cl_head") $ do
         tr_ (id_ "cl-header") $ do
            th_ (id_ "chans-head-type") "Type"
-           th_ (id_ "chans-head-definition") "Definition"
            th_ (id_ "chans-head-clients") "Clients"
            th_ (id_ "chans-head-messages") "Values"
       tbody_ (id_ "cl-body") $ mapM_ (uiItem_ . (st,)) $ channels st
@@ -77,78 +78,77 @@ uiChannels_ st = section_ (id_ "main") $
 
 uiItem_ (st,chan) = viewWithKey uiItem (channelKey chan) (st,chan) mempty
 
--- | A view for each ui item.  We specifically use a ReactView here to take advantage of the
--- ability for React to only re-render the ui items that have changed.  Care is taken in the
--- transform function of the store to not change the Haskell object for the pair (Int, Ui), and
--- in this case React will not re-render the ui item.  For more details, see the "Performance"
--- section of the React.Flux documentation.
 uiItem :: ReactView (State,Channel)
 uiItem = defineView "ui item" $ \(st,chan) -> do
   let tkey = channelKey chan
   tr_ [ --classNames [("completed", uiComplete ui), ("editing", uiIsEditing ui)],
-     "key" @= tkey
+    "key" @= tkey
     ,"id" @= tkey
     ] $ do
+    td_ [] $ typeDef_ st chan
+    td_ [] $ elemText . unwords . map (show.clientID) . channelClients $ chan
+    td_ [] $
+      case typesEnv st of
+        Nothing -> return ()
+        Just _ ->
+          case channelInput chan of
+            Nothing -> action_ "Show Values" "Watch values transferred on this channel" (OpenChan $ channelType chan)
+            Just i  -> do
+                action_ "Hide Values" "Stop watching values transferred on this channel" (CloseChan $ channelType chan)
+                mapM_ (p_ [] . elemText) $ chanMsgs i
 
-        -- cldiv_ "view" $ do
-        --     input_ [ "className" $= "toggle"
-        --            , "type" $= "checkbox"
-        --            , "checked" @= uiComplete ui
-        --            , onChange $ \_ -> dispatchUi $ UiSetComplete uiIdx $ not $ uiComplete ui
-        --            ]
+-- typeSource :: State -> Channel -> ReactElementM eventHandler ()
+-- typeSource st chan = either (const "") id (maybe  (Left "no types") (\env -> adt_ env <$> typeDefinition env (channelType chan)) (typesEnv st))
 
-             td_ [] $ elemText $ channelShow st chan
-             td_ [] $ typeSource st chan
-             td_ [] $ elemText . unwords . map (show.clientID) . channelClients $ chan
-             td_ [] $
-               case typesEnv st of
-                 Nothing -> return ()
-                 Just _ ->
-                   case channelInput chan of
-                     Nothing -> action_ "Show Values" "Watch values transferred on this channel" (OpenChan $ channelType chan)
-                     Just i  -> do
-                       action_ "Hide Values" "Stop watching values transferred on this channel" (CloseChan $ channelType chan)
-                       mapM_ (p_ [] . elemText) $ chanMsgs i
+typeSource :: State -> Channel -> Either String (ADTEnv,[AbsADT])
+typeSource st chan = maybe (Left "no types") (\env -> (env,) <$> typeDefinition env (channelType chan)) (typesEnv st)
 
-        -- when (uiIsEditing ui) $
-        --     uiTextInput_ TextInputArgs
-        --         { tiaId = Nothing
-        --         , tiaClass = "edit"
-        --         , tiaPlaceholder = ""
-        --         , tiaOnSave = dispatchUi . UpdateText uiIdx
-        --         , tiaValue = Just $ uiText ui
-        --         }
-
-typeSource :: State -> Channel -> ReactElementM eventHandler ()
-typeSource st chan = maybe "" (\env -> adt_ env $ typeDefinition env (channelType chan)) $ typesEnv st
+showADTs :: ADTEnv -> [AbsADT] -> [String]
+showADTs env = map (prettyShow . (env,))
 
 adt_ :: ADTEnv -> [AbsADT] -> ReactElementM eventHandler ()
-adt_ env = span_ [] . mapM_ (longTextDisplay_ . prettyShow . (env,))
+adt_ env = span_ [] . mapM_ longTextDisplay_ . showADTs env
 
 longTextDisplay_ :: String -> ReactElementM eventHandler ()
 longTextDisplay_ txt = view longTextDisplay txt mempty
 
 longTextDisplay :: ReactView String
 longTextDisplay = defineStatefulView "long text" False $ \showAll txt ->
-     pre_ [ onClick $ \_ _ st -> ([], Just $ not st)] (elemText $ if showAll then txt else shorter txt)
+  pre_ [ onClick $ \_ _ st -> ([], Just $ not st)] (elemText $ if showAll then txt else shorter txt)
 
 shorter s =
    let ln = lines s
        o = take 11 ln
    in unlines $ if length ln > 11 then o ++ ["..."] else o
 
+typeDef_ :: State -> Channel  -> ReactElementM eventHandler ()
+typeDef_ st chan = view typeDef (st,chan) mempty
+
+typeDef :: ReactView (State,Channel)
+typeDef = defineStatefulView "typeDef" False $ \showDefinition (st,chan) -> do
+  h5_ [] $ elemText $ channelShow st chan
+  case typeSource st chan of
+    Left _ -> return ()
+    Right (env,syntax) -> do
+       h5_ [onClick $ \_ _ showDef -> ([], Just $ not showDef)
+           ,"title" @= unwords ["Click to ",if showDefinition then "hide" else "show","definition"]] (elemText $ "Definition" ++ if showDefinition then "" else " ...")
+       when showDefinition $ do
+         button_ [classNames [("clipboard",True)]
+                 ,"data-clipboard-text" @= (intercalate "\n\n" . showADTs env $ syntax)] "Copy to Clipboard"
+         adt_ env syntax
+
 uiADTs_ :: State -> ReactElementM eventHandler ()
 uiADTs_ st = view uiADTs st mempty
 
 uiADTs :: ReactView State
-uiADTs = defineStatefulView "all adts" Nothing $ \maybeRef st -> do
-  p_ (id_ "all-adts") $ do
-    case typesEnv st of
-      Nothing -> "Loading data types list ..."
-      Just env -> do
-        h4_ [] "Known types"
-        mapM_ (\(ref,adt) -> span_ ["title" $= "Click to display definition","key" @= prettyShow ref,onClick $ \_ _ _ -> ([],Just (Just ref))] (elemText . (' ':) . declName $ adt)) . sortBy (comparing (declName . snd)) . M.assocs $ env
-        maybe (elemText "") (adt_ env . adtDefinition env) maybeRef
+uiADTs = defineStatefulView "all adts" Nothing $ \maybeRef st -> -- do
+--    span_ (id_ "all-adts") $ do
+     case typesEnv st of
+       Nothing -> h4_ [] "Loading data types list ..."
+       Just env -> do
+         h4_ [] "Known types"
+         mapM_ (\(ref,adt) -> span_ ["title" $= "Click to display definition","key" @= prettyShow ref,onClick $ \_ _ _ -> ([],Just (Just ref))] (elemText . (' ':) . declName $ adt)) . sortBy (comparing (declName . snd)) . M.assocs $ env
+         either (const "") (adt_ env) (maybe (Left "no ref") (adtDefinition env) maybeRef)
 
 -- | A render combinator for the footer
 uiFooter_ :: State -> ReactElementM eventHandler ()
@@ -156,7 +156,11 @@ uiFooter_ s = view uiFooter s mempty
 
 uiFooter :: ReactView State
 uiFooter = defineView "footer" $ \st ->
-  footer_ (id_ "footer") $ ""
+  footer_ (id_ "footer") . small_ [] $ do
+    p_ [] ""
+    "Check the "
+    a_ ["href" $= "https://github.com/tittoassini/quid2-net-apps-ghcjs"] "source code"
+    " of this application."
 
 action_ :: String -> String -> Action -> ReactElementM ViewEventHandler ()
 action_ name legend act = button_ (["id" @= show act
@@ -170,6 +174,3 @@ countM n s = strong_ (elemShow n) >> elemText (unwords ["",asN n s,""])
 
 asN :: Int -> String -> String
 asN n s = s ++ (if n == 1 then "" else "s")
-
-
-

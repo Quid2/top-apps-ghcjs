@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeFamilies, DeriveGeneric, DeriveAnyClass ,StandaloneDeriving, FlexibleInstances ,TypeSynonymInstances#-}
 module UI.Store where
-import Report
+import Model.Report
 import React.Flux
 import Control.DeepSeq
 import GHC.Generics (Generic)
@@ -126,16 +126,6 @@ instance StoreData State where
 -- on mv = case mv of Nothing -> return 
 
 byType = let TypeApp f _ = absType (Proxy::Proxy (ByType ())) in f
-
--- resolve st chans =
---   case typesEnv st of
---     Nothing -> chans
---     Just env -> map (resolveChan env) chans
-
--- resolveChan env chan =
---    case channelShow chan of
- --      Nothing -> chan {channelShow = Just . label env absADTName . channelType $ chan}
---      Just _ -> chan
 
 merge ns os = reverse $ mer [] ns os
   where

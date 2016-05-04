@@ -1,6 +1,7 @@
-resolver: lts-5.12
+resolver: lts-5.15
 
 packages:
+- '.'
 - ../model
 - ../flat
 - ../typed

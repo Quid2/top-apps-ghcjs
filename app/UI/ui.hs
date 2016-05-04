@@ -15,4 +15,4 @@ main = do
   forkIO $ alterStore store UpdateTypes
   forkIO $ updateLoop
   reactRender "app" uiApp ()
-    where updateLoop= alterStore store UpdateChannels >> threadDelay (seconds updateDelay) >> updateLoop
+    where updateLoop = alterStore store UpdateChannels >> threadDelay (seconds updateDelay) >> updateLoop
