@@ -1,25 +1,27 @@
-.PHONY: all clean
+.PHONY: all dev build clean
+PROJECT:=ui
 INSTALL_ROOT:=$(shell stack path --local-install-root)
+JSALL:=$(INSTALL_ROOT)/bin/$(PROJECT).jsexe/all.js
 
-all: build
-# js-build/ui.min.js
-
-build: $(INSTALL_ROOT)
-	- rm build
-	ln -s $(INSTALL_ROOT)/bin/ui.jsexe build
+all: build all.min.js
 
 dev:
-	cd ../../;stack build --file-watch
+	cd ../../;stack build --file-watch --exec 'make -f www/$(PROJECT)/Makefile all.js'
 
-build/ui.min.js: build/ui.js
-	closure --compilation_level=ADVANCED_OPTIMIZATIONS build/ui.js > build/ui.min.js
-
-build/ui.js: $(INSTALL_ROOT)/bin/ui.jsexe/all.js
-	echo "(function(global,React,ReactDOM) {" > ui.js
-	cat build/all.js >> ui.js
-	echo "})(window, window['React'], window['ReactDOM']);" >> ui.js
-	sed -i 's/goog.provide.*//' ui.js
-	sed -i 's/goog.require.*//' ui.js
+build:
+	cd ../../;stack build
 
 clean:
-	rm -rf build
+	rm all.js all.min.js
+
+all.min.js: all.js
+	sed -i "" -e 's/goog.provide.*//' all.js
+	sed -i "" -e 's/goog.require.*//' all.js
+  # Advanced optimizations won't work with quid2.net
+	ccjs all.js --compilation_level=SIMPLE_OPTIMIZATIONS > all.min.js
+
+all.js: $(JSALL)
+	echo "(function(global,React,ReactDOM) {" > all.js
+	cat $(JSALL) >> all.js
+	echo "})(window, window['React'], window['ReactDOM']);" >> all.js
+
