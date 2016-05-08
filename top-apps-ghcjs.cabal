@@ -1,0 +1,38 @@
+name:                top-apps-ghcjs
+version:             0.1.0.0
+synopsis:            WWW examples application for top (typed oriented protocol) using ghcjs
+description:         Please see README.md
+homepage:            http://github.com/tittoassini/top-apps-ghcjs
+license:             BSD3
+license-file:        LICENSE
+author:              Pasqualino `Titto` Assini
+maintainer:          tittoassini@gmail.com
+copyright:           Copyright: (c) 2016 Pasqualino `Titto` Assini
+category:            Network
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     GHCJS.Util
+  build-depends:       base >= 4.7 && < 5,transformers,ghcjs-base,ghcjs-dom,flat,typed,top
+  default-language:    Haskell2010
+
+executable chat
+  hs-source-dirs:      app
+  main-is:             Chat/chat.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base,transformers,async,pipes,typed,text,bytestring,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,top-apps-ghcjs
+  default-language:    Haskell2010
+
+executable ui
+  hs-source-dirs:      app
+  main-is:             UI/ui.hs
+  other-modules:Model.Report,Data.Time.Util,UI.Dispatcher,UI.Store,UI.Views,UI.ServerState
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base,transformers,async,pipes,typed,text,bytestring,time,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,react-flux,deepseq,containers,top-apps-ghcjs
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: http://github.com/tittoassini/top-apps-ghcjs
