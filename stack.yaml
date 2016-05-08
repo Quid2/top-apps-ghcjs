@@ -1,11 +1,11 @@
-resolver: lts-5.15
+resolver: lts-5.13
 
 packages:
 - '.'
 - ../model
 - ../flat
 - ../typed
-- ../quid2-net
+- ../top
 
 extra-deps:
 - ghcjs-dom-0.2.3.1
