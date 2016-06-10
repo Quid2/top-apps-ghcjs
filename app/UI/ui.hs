@@ -1,9 +1,9 @@
 module Main where
 
 import           Control.Concurrent
-import           Network.Quid2
-import           Network.Quid2.Repo (knownTypes)
-import           Network.Quid2.Util (seconds)
+import           Network.Top
+import           Network.Top.Repo (knownTypes)
+import           Network.Top.Util (seconds)
 import           React.Flux
 import           System.IO          (stdout)
 import           UI.Store

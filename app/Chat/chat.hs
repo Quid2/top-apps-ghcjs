@@ -31,7 +31,7 @@ import           GHCJS.DOM.UIEvent
 import           GHCJS.Marshal
 import           GHCJS.Util                 (getKey)
 -- import           JavaScript.Web.WebSocket
-import           Network.Quid2              hiding (cat)
+import           Network.Top              hiding (cat)
 import           Pipes                      (Producer', cat, for)
 import           Pipes.Concurrent           hiding (send)
 import qualified Pipes.Concurrent           as PC

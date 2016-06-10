@@ -1,19 +1,23 @@
-{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveGeneric ,DeriveAnyClass #-}
 module Chat.Model where
 
 import  Data.Typed
+
+-- We need to derive instances for Flat (binary serialisation so that our values can be tranferred on the network)
+-- and Model (so that their structure can be picked up by the system)
+-- both instances are derived automatically provided that our data type derive Generic
 
 -- Data model for a simple chat system
 data Message = Message {fromUser::User
                        ,subject::Subject
                        ,content::Content User Message}
-             deriving (Eq, Ord, Read, Show, Generic)
+             deriving (Eq, Ord, Read, Show, Generic, Flat, Model)
 
-data User = User {userName::String} deriving (Eq, Ord, Read, Show, Generic)
+data User = User {userName::String} deriving (Eq, Ord, Read, Show, Generic, Flat, Model)
 
 -- Hierarchical subject
 -- Example: Subject ["Haskell","Meeting","Firenze"]
-data Subject = Subject [String] deriving (Eq, Ord, Read, Show, Generic)
+data Subject = Subject [String] deriving (Eq, Ord, Read, Show, Generic, Flat, Model)
 
 -- Different kinds of contents
 data Content user message =
@@ -42,17 +46,7 @@ data Content user message =
 
              -- and so on ...
 
-             deriving (Eq, Ord, Read, Show, Generic)
+             deriving (Eq, Ord, Read, Show, Generic, Flat)
 
--- We need to derive instances for Flat (binary serialisation so that our values can be tranferred on the network)
--- and Model (so that their structure can be picked up by the system)
--- both instances are derived automatically provided that our data type derive Generic
-instance Flat Message
-instance Flat User
-instance Flat Subject
-instance (Flat a, Flat b) => Flat (Content a b)
-
-instance Model Message
-instance Model User
-instance Model Subject
+-- We need to derive this explicitly, because of a limitation of 'model'
 instance (Model a,Model b) => Model (Content a b)

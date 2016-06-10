@@ -10,7 +10,7 @@ import UI.ServerState
 import Control.Concurrent
 import Control.Monad
 import Data.List
-import Network.Quid2
+import Network.Top
 import qualified Data.Map as M
 import Data.Ord
 import Data.Maybe

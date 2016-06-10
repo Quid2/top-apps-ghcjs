@@ -133,9 +133,13 @@ typeDef = defineStatefulView "typeDef" False $ \showDefinition (st,chan) -> do
        h5_ [onClick $ \_ _ showDef -> ([], Just $ not showDef)
            ,"title" @= unwords ["Click to ",if showDefinition then "hide" else "show","definition"]] (elemText $ "Definition" ++ if showDefinition then "" else " ...")
        when showDefinition $ do
-         button_ [classNames [("clipboard",True)]
-                 ,"data-clipboard-text" @= (intercalate "\n\n" . showADTs env $ syntax)] "Copy to Clipboard"
-         adt_ env syntax
+          "Copy to Clipboard "
+          let canonicalCode = (intercalate "\n\n" . showADTs env $ syntax)
+          let haskellCode = unwords $ ["typed"] ++ (map prettyShow . M.keys $ env) ++ ["--srcDir <your_project_src_dir>"]
+          copyButton_ haskellCode "Haskell Code"
+          " "
+          copyButton_ canonicalCode "Canonical Code"
+          adt_ env syntax
 
 uiADTs_ :: State -> ReactElementM eventHandler ()
 uiADTs_ st = view uiADTs st mempty
@@ -147,7 +151,7 @@ uiADTs = defineStatefulView "all adts" Nothing $ \maybeRef st -> -- do
        Nothing -> h4_ [] "Loading data types list ..."
        Just env -> do
          h4_ [] "Known types"
-         mapM_ (\(ref,adt) -> span_ ["title" $= "Click to display definition","key" @= prettyShow ref,onClick $ \_ _ _ -> ([],Just (Just ref))] (elemText . (' ':) . declName $ adt)) . sortBy (comparing (declName . snd)) . M.assocs $ env
+         mapM_ (\(ref,adt) -> span_ ["title" $= "Click to display definition","key" @= prettyShow ref,onClick $ \_ _ _ -> ([],Just (Just ref))] (elemText . (' ':) . T.unpack . declName $ adt)) . sortBy (comparing (T.unpack . declName . snd)) . M.assocs $ env
          either (const "") (adt_ env) (maybe (Left "no ref") (adtDefinition env) maybeRef)
 
 -- | A render combinator for the footer
@@ -159,8 +163,11 @@ uiFooter = defineView "footer" $ \st ->
   footer_ (id_ "footer") . small_ [] $ do
     p_ [] ""
     "Check the "
-    a_ ["href" $= "https://github.com/tittoassini/quid2-net-apps-ghcjs"] "source code"
+    a_ ["href" $= "https://github.com/tittoassini/top-apps-ghcjs"] "source code"
     " of this application."
+
+copyButton_ :: String -> String -> ReactElementM eventHandler ()
+copyButton_ txt name = button_ [classNames [("clipboard",True)],"data-clipboard-text" @= txt] $ elemText name
 
 action_ :: String -> String -> Action -> ReactElementM ViewEventHandler ()
 action_ name legend act = button_ (["id" @= show act

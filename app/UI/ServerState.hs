@@ -8,14 +8,14 @@ import qualified Data.ByteString.Lazy as L
 import Model.Report
 import Control.Monad
 import Data.Maybe
-import Network.Quid2.Types(Config(..),def)
+import Network.Top.Types(Config(..),def,cfgIP,cfgPort)
 
 getByType :: IO [(AbsType, ClientReport)]
 getByType = fmap byTypeReport (getServerState def)
 
 getServerState cfg = do
   res <- xhrByteString $ Request {reqMethod=GET
-                                 ,reqURI= J.pack $ concat["http://",ip cfg,":",show (port cfg),"/report"]
+                                 ,reqURI= J.pack $ concat["http://",cfgIP cfg,":",show (cfgPort cfg),"/report"]
                                  ,reqLogin=Nothing
                                  ,reqHeaders=[]
                                  ,reqWithCredentials=False
