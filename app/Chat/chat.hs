@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs                     #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
 {-# LANGUAGE TemplateHaskell           #-}
 
 -- |A very basic chat client
@@ -15,9 +16,9 @@ import           Control.Monad
 import           Control.Monad.Trans.State
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Lazy       as L
-import           Data.Digest.Shake128
+-- import           Data.Digest.SHA3
 import qualified Data.JSString              as S
-import           Data.Pattern
+-- import           Data.Pattern
 import           Data.Word
 import           GHCJS.DOM                  (enableInspector, runWebGUI,
                                              webViewGetDomDocument)
@@ -31,7 +32,7 @@ import           GHCJS.DOM.UIEvent
 import           GHCJS.Marshal
 import           GHCJS.Util                 (getKey)
 -- import           JavaScript.Web.WebSocket
-import           Network.Top              hiding (cat)
+import           Network.Top                hiding (cat)
 import           Pipes                      (Producer', cat, for)
 import           Pipes.Concurrent           hiding (send)
 import qualified Pipes.Concurrent           as PC
@@ -42,7 +43,8 @@ import           System.IO                  (stdout)
 
 main = runWebGUI $ \ webView -> do
      -- enableInspector webView
-     logLevelOut DEBUG stdout
+     dbgS "started"
+     logLevel DEBUG
 
      Just doc <- webViewGetDomDocument webView
      Just body <- getBody doc
@@ -50,7 +52,7 @@ main = runWebGUI $ \ webView -> do
      Just inp <- getElementById doc "ipt"
      Just out <- getElementById doc "out"
      Just status <- getElementById doc "status"
-
+     dbgS "here 1"
      let
        -- The subject of the discussion
        subjL = ["Haskell"]
@@ -68,8 +70,8 @@ main = runWebGUI $ \ webView -> do
                liftIO $ addStatus ("Connected as: "++userName)
                lift $ put $ Just userName
                return ()))) Nothing
-     -- let user = "tst"
 
+     -- let user = "tst"
      -- Asynchronously, receive messages and display them
      -- We use a simple pipe, to get a message from the connection (pipeIn) and print it
      async $ runConn ByType $ \conn -> void $ execStateT (runEffect (pipeIn conn >-> niceMessage subj >-> for cat (void . liftIO . addMsg))) (ChatState False)
@@ -99,7 +101,8 @@ userInput doc out title minLen maxLen = bracket setup final run
   where
     setup = do
       setInnerHTML out $ Just (concat ["<input type=text maxlength=",show maxLen," size=",show (max 60 maxLen)," id='inputArea' placeholder='",title,"'></input>"])
-      Just inElem <- fmap castToHTMLInputElement <$> getElementById doc "inputArea"
+      Just inputArea <- getElementById doc "inputArea"
+      inElem <- castToHTMLInputElement inputArea
       focus inElem
       (output, input, seal) <- PC.spawn' PC.Unbounded
       on inElem keyPress $ do

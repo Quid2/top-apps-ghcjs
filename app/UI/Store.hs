@@ -14,7 +14,6 @@ import Network.Top
 import qualified Data.Map as M
 import Data.Ord
 import Data.Maybe
--- import Data.Flat
 
 data State = State {channels::[Channel]
                    ,typesEnv::Maybe ADTEnv
@@ -77,12 +76,16 @@ instance StoreData State where
 
           OpenChan t -> do
             let openChan env chan = when (isNothing $ channelInput chan) $ do
-                 tid <- forkIO $ runWSClient def (app t)
+                 tid <- forkIO $ runClient_ def (byTypeRouter t) rcvMessages
                  void $ forkIO $ do
                    let i = ChannelInput tid (typeDecoderEnv env t) []
                    alterStore store (SetChannelInput t (Just i))
             cond (openChan <$> typesEnv st <*> lookChan st t)
             return st
+              where rcvMessages conn = do
+                      r <- input conn
+                      alterStore store (MsgIn t r)
+                      rcvMessages conn
 
           CloseChan t -> do
              let closeChan i = void . forkIO $ do
@@ -114,18 +117,7 @@ instance StoreData State where
 
             modifyChan st t f = return $ st {channels = map (\ch -> if t == channelType ch then f ch else ch) (channels st)}
 
-            app t conn = do
-               output conn $ flat $ TypeApp byType t
-               inputMsg t conn
-
-            inputMsg t conn = do
-              r <- input conn
-              alterStore store (MsgIn t r)
-              inputMsg t conn
-
 -- on mv = case mv of Nothing -> return 
-
-byType = let TypeApp f _ = absType (Proxy::Proxy (ByType ())) in f
 
 merge ns os = reverse $ mer [] ns os
   where

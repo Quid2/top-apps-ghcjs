@@ -26,15 +26,18 @@ getServerState cfg = do
   printReport report
   return report
 
+bytes = L.unpack . unblob
+
 byTypeReport st = let [ByTypeReport vs] = byTypeReport_ st
                   in vs
 
-byTypeReport_ (NestedReport n (TypedBytes t bs) ss) =
+byTypeReport_ (NestedReport n (TypedBLOB t b) ss) =
    if (t == byTypeReportType)
-   then [dec bs::ByTypeReport]
+   then [dec (bytes b)::ByTypeReport]
    else concatMap byTypeReport_ ss
 
-printReport (NestedReport n (TypedBytes t bs) ss) = do
+printReport (NestedReport n (TypedBLOB t b) ss) = do
+  let bs = bytes b
   putStrLn n
   print t
   print ("warpReportType",warpReportType)
