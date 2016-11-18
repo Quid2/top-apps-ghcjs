@@ -68,7 +68,7 @@ instance StoreData State where
 
           UpdateChannels -> do
             forkIO $ do
-              chans <- getByType
+              chans <- getChannels
               let cs = map (\l -> (fst . head $ l,map snd l)) . groupBy (\a b -> fst a == fst b) . sort $ chans
               -- alterStore store (SetChans (resolve st $ merge cs (channels st)))
               alterStore store (SetChans (merge cs (channels st)))
@@ -135,7 +135,7 @@ store = mkStore $ State [] Nothing
 -- TODO: move in library
 -- deriving instance NFData State
 -- deriving instance NFData Channel
-deriving instance NFData Time
+-- deriving instance NFData Time
 -- deriving instance NFData ADTRef
 -- deriving instance (NFData a,NFData b) => NFData (ADT a b) 
 -- deriving instance NFData a => NFData (Type a)

@@ -28,7 +28,7 @@ executable chat
 executable ui
   hs-source-dirs:      app
   main-is:             UI/ui.hs
-  other-modules:Model.Report,Data.Time.Util,UI.Dispatcher,UI.Store,UI.Views,UI.ServerState
+  other-modules:UI.Dispatcher,UI.Store,UI.Views,UI.ServerState
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base,transformers,async,pipes,typed,text,bytestring,time,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,react-flux,deepseq,containers,top-apps-ghcjs,ListLike
   default-language:    Haskell2010
