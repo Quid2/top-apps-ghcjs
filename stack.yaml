@@ -1,40 +1,51 @@
 packages:
 - '.'
-#- ../model
-#- ../flat
-#- ../typed
-#- ../top
 
-- location:
-    git: https://github.com/tittoassini/top
-    commit: 618fcab4c1bd87008f14ef1f199a5dee795f7045
+# - location: ../model
+#   extra-dep: true
+
+# - location: ../flat
+#   extra-dep: true
+
+- location: ../zm
   extra-dep: true
-- location:
-    git: https://github.com/tittoassini/typed
-    commit: 00b39b1e94dc2a047e6371a1622c8ee411882efe
+
+- location: ../top
   extra-dep: true
-- location:
-   git: https://github.com/tittoassini/flat
-   commit: 3771f5946dd506c6f199aa4047186d5b57bdce5f
-  extra-dep: true
-- location:
-   git: https://github.com/tittoassini/model
-   commit: b05a56a993213271e3b13d28a5e8bb90c9d8576f
-  extra-dep: true
+
+# - location:
+#     git: https://github.com/tittoassini/top
+#     commit: 618fcab4c1bd87008f14ef1f199a5dee795f7045
+#   extra-dep: true
 
 extra-deps:
+- model-0.3
+- flat-0.3
 - ghcjs-dom-0.3.0.1
 #- ghcjs-dom-0.5.0.0
 #- ghcjs-dom-jsffi-0.5.0.0
 - ed25519-0.0.5.0
 - react-flux-1.2.3
+- mono-traversable-1.0.2
+- happy-1.19.5 # required to avoid a stack bug
 
-resolver: lts-7.3
-compiler: ghcjs-0.2.1.9007003_ghc-8.0.1
+# resolver: lts-7.19
+# compiler: ghcjs-0.2.1.9007003_ghc-8.0.1
+# compiler-check: match-exact
+# setup-info:
+#   ghcjs:
+#     source:
+#       ghcjs-0.2.1.9007003_ghc-8.0.1:
+#           url: http://ghcjs.tolysz.org/ghc-8.0-2016-10-11-lts-7.3-9007003.tar.gz
+#           sha1: 3196fd5eaed670416083cf3678396d02c50096de
+
+resolver: lts-7.19
+compiler: ghcjs-0.2.1.9007019_ghc-8.0.1
 compiler-check: match-exact
+
 setup-info:
   ghcjs:
     source:
-      ghcjs-0.2.1.9007003_ghc-8.0.1:
-          url: http://ghcjs.tolysz.org/ghc-8.0-2016-10-11-lts-7.3-9007003.tar.gz
-          sha1: 3196fd5eaed670416083cf3678396d02c50096de
+      ghcjs-0.2.1.9007019_ghc-8.0.1:
+           url: http://ghcjs.tolysz.org/ghc-8.0-2017-02-05-lts-7.19-9007019.tar.gz
+           sha1: d2cfc25f9cda32a25a87d9af68891b2186ee52f9

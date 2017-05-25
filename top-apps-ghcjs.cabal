@@ -15,22 +15,23 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     GHCJS.Util
-  build-depends:       base >= 4.7 && < 5,transformers,ghcjs-base,ghcjs-dom,flat,typed,top
+  build-depends:       base >= 4.7 && < 5,transformers,ghcjs-base,ghcjs-dom,flat,zm,top
   default-language:    Haskell2010
 
 executable chat
   hs-source-dirs:      app
   main-is:             Chat/chat.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base,transformers,async,pipes,typed,text,bytestring,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,top-apps-ghcjs
+  other-modules: Chat.Model,Chat.Util
+  build-depends:       base,transformers,async,pipes,zm,text,bytestring,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,top-apps-ghcjs
   default-language:    Haskell2010
 
 executable ui
   hs-source-dirs:      app
   main-is:             UI/ui.hs
-  other-modules:UI.Dispatcher,UI.Store,UI.Views,UI.ServerState
+  other-modules:UI.Dispatcher,UI.Store,UI.Views,UI.ServerState,Data.Time.Util,Model.Report,Model.Report.Util
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base,transformers,async,pipes,typed,text,bytestring,time,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,react-flux,deepseq,containers,top-apps-ghcjs,ListLike
+  build-depends:       base,transformers,async,pipes,zm,text,bytestring,time,pipes-safe,pipes-concurrency,ghcjs-base,ghcjs-dom,top,react-flux,deepseq,containers,top-apps-ghcjs,ListLike
   default-language:    Haskell2010
 
 source-repository head

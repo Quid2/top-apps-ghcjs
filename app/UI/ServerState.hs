@@ -6,7 +6,7 @@ import qualified Data.JSString                 as J
 import           JavaScript.Web.XMLHttpRequest
 import           Model.Report
 import           Model.Report.Util
-import Data.Typed
+import ZM
 import Network.Top.Types(def)
 
 -- getChannels :: IO [(AbsType, ClientReport)]
@@ -28,6 +28,6 @@ getServerState cfg = do
                                  ,reqData=NoData}
   let Just dt = contents res
   print $ B.unpack dt
-  let Right report = unflat . L.fromStrict $ dt
+  let Right report = unflat dt
   printReport report
   return report

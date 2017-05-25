@@ -12,12 +12,13 @@ import qualified Data.Map                    as M
 import           Data.Maybe
 import           Data.Ord
 import qualified Data.Text                   as T
-import           Data.Typed
+import           ZM
 import           Model.Report
 import           React.Flux
 import           React.Flux.Addons.Bootstrap
 import           UI.Dispatcher
 import           UI.Store
+import Data.Monoid
 
 updateDelay :: Int
 updateDelay = 15
@@ -96,23 +97,20 @@ uiItem = defineView "ui item" $ \(st,chan) -> do
             Nothing -> action_ "Show Values" "Watch values transferred on this channel" (OpenChan $ channelType chan)
             Just i  -> do
                 action_ "Hide Values" "Stop watching values transferred on this channel" (CloseChan $ channelType chan)
-                mapM_ (p_ [] . elemString) $ chanMsgs i
+                mapM_ (p_ . mapM (div_ . elemString)) $ chanMsgs i
 
 -- typeSource :: State -> Channel -> ReactElementM eventHandler ()
 -- typeSource st chan = either (const "") id (maybe  (Left "no types") (\env -> adt_ env <$> typeDefinition env (channelType chan)) (typesEnv st))
 
-typeSource :: State -> Channel -> Either String (ADTEnv,[AbsADT])
+typeSource :: State -> Channel -> Either String (AbsEnv,[AbsADT])
 typeSource st chan = maybe (Left "no types") (\env -> (env,) <$> typeDefinition env (channelType chan)) (typesEnv st)
 
--- showADTs :: ADTEnv -> [AbsADT] -> [T.Text]
--- showADTs env = map (prettyText . (env,))
-showADTs :: ADTEnv -> [AbsADT] -> [String]
-showADTs env = map (prettyShow . (env,))
+showADTs :: AbsEnv -> [AbsADT] -> [String]
+showADTs env = reverse . map (prettyShow . (env,))
 
-adt_ :: ADTEnv -> [AbsADT] -> ReactElementM eventHandler ()
+adt_ :: AbsEnv -> [AbsADT] -> ReactElementM eventHandler ()
 adt_ env = span_ [] . mapM_ longTextDisplay_ . showADTs env
 
--- longTextDisplay_ :: T.Text -> ReactElementM eventHandler ()
 longTextDisplay_ :: String -> ReactElementM eventHandler ()
 longTextDisplay_ txt = view longTextDisplay txt mempty
 
@@ -145,9 +143,9 @@ typeDef = defineStatefulView "typeDef" False $ \showDefinition (st,chan) -> do
        when showDefinition $ do
           "Copy to Clipboard "
           let canonicalCode = (T.intercalate "\n\n" . map T.pack . showADTs env $ syntax)
-          let haskellCode = T.unwords $ ["typed"] ++ (map prettyText . M.keys $ env) ++ ["--srcDir <your_project_src_dir>"]
-          copyButton_ haskellCode "Haskell Code"
-          " "
+          --let haskellCode = T.unwords $ ["zm"] ++ (map prettyText . M.keys $ env) ++ ["--srcDir <your_project_src_dir>"]
+          --copyButton_ haskellCode "Haskell Code"
+          --" "
           copyButton_ canonicalCode "Canonical Code"
           adt_ env syntax
 

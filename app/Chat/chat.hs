@@ -126,7 +126,7 @@ userInput doc out title minLen maxLen = bracket setup final run
       seal
       setInnerHTML out (Just "")
 
-runConn = runClient def -- (def {ip="127.0.0.1"})
+runConn = runApp def -- (def {ip="127.0.0.1"})
 
 runPipe = runSafeT . runEffect
 

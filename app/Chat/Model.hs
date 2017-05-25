@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveGeneric ,DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric ,DeriveAnyClass ,FlexibleInstances #-}
 module Chat.Model where
 
-import  Data.Typed
+import  ZM
 
 -- We need to derive instances for Flat (binary serialisation so that our values can be tranferred on the network)
 -- and Model (so that their structure can be picked up by the system)
@@ -46,7 +46,9 @@ data Content user message =
 
              -- and so on ...
 
-             deriving (Eq, Ord, Read, Show, Generic, Flat)
+             deriving (Eq, Ord, Read, Show, Generic) -- , Flat)
+
+instance Flat (Content User Message)
 
 -- We need to derive this explicitly, because of a limitation of 'model'
 instance (Model a,Model b) => Model (Content a b)
