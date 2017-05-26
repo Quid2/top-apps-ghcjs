@@ -7,11 +7,11 @@ packages:
 # - location: ../flat
 #   extra-dep: true
 
-- location: ../zm
-  extra-dep: true
+# - location: ../zm
+#   extra-dep: true
 
-- location: ../top
-  extra-dep: true
+# - location: ../top
+#   extra-dep: true
 
 # - location:
 #     git: https://github.com/tittoassini/top
@@ -21,6 +21,8 @@ packages:
 extra-deps:
 - model-0.3
 - flat-0.3
+- zm-0.2.4
+- top-0.2
 - ghcjs-dom-0.3.0.1
 #- ghcjs-dom-0.5.0.0
 #- ghcjs-dom-jsffi-0.5.0.0

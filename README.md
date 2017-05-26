@@ -6,14 +6,6 @@ Applications:
 * [ui](app/UI) ([live version](http://quid2.org/app/ui)).
   * Generic UI for top, shows existing channels and types, developed using [react-flux](https://hackage.haskell.org/package/react-flux).
 
-### Installation 
-
-Start by installing the [quid2](https://github.com/tittoassini/quid2) project, of which this is a sub-project, then switch to this project to continue the installation:
-
-```
-cd top-apps-ghcjs
-```
-
 #### GHCJS setup
 
 Some versions of `stack` do not build `ghcjs` correctly so upgrade to the latest `stack`:
